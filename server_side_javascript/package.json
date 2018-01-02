@@ -1,0 +1,18 @@
+{
+  "name": "server_side_javascript",
+  "version": "1.0.0",
+  "description": "Server side javascript tutorials",
+  "main": "hello.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/Jbok/practice_nodejs.git)"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
