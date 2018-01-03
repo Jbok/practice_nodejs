@@ -5,6 +5,26 @@ app.locals.pretty = true; //make temp.jade's code pretty
 app.set('views', './views');
 app.set('view engine', 'jade');
 app.use(express.static('public')) //static file location
+
+///////usage of query object////////
+app.get('/topic/:id',function(req,res){
+  var topics=[
+    'Javascript is...',
+    'Nodejs is ...',
+    'Express is ...'
+  ];
+  var output =`
+    <a href="/topic?id=0">JavaScript</a><br>
+    <a href="/topic?id=1">Nodejs</a><br>
+    <a href="/topic?id=2">Express</a><br><br>
+    ${topics[req.params.id]}
+  `
+  res.send(output);
+})
+app.get('/topic/:id/:mode', function(req,res){
+  res.send(req.params.id+','+req.params.mode);
+})
+////////////////////////////////////
 const port = 3000;
 app.get('/template', function(req,res){
   res.render('temp', {time:Date(), _title:'Jade'});
