@@ -29,7 +29,7 @@ app.get('/topic/add', function(req, res){
   })
 })
 
-//Show list
+//add list
 app.post('/topic/add', function(req, res){
   var title = req.body.title;
   var description = req.body.description;
