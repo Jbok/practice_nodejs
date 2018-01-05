@@ -2,6 +2,9 @@ var express = require('express');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var bodyParser = require('body-parser');
+var pbkdf2 = require('pbkdf2-password');
+var bkfd2Password = require("pbkdf2-password");
+var hasher = bkfd2Password();
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(session({
@@ -51,22 +54,26 @@ app.get('/auth/register', function(req, res){
 var users =[
   {
     username:'sipsyong',
-    password:'123',
+    password: '/0st/MwO93Pb7zhSbEDDuekrwPdZX6c1QEBReEdVBltmbgTVfCH2aUplGmOYm1RsJGNQDSpfc2N6u5aTgSndqHP0pajkYD8nhHGwHn0p6bPrDzkxXSDeUaTYa/Gs552a5cWhuysGPw/CSBjdWCXaOZpIN65IeZmDUk3pC5rGK4E=',
+    salt:'O8tiBxvrIhkYuPhmZztf1+JrVEkQTvN8biR0wYJErql24wojXml/Xi9rH7u7ctglIXkHKioSjheogIAybaSEyA==',
     displayName:'Nick sipsyong'
   }
 ];
 
 app.post('/auth/register', function(req, res){
-  var user ={
-    username: req.body.username,
-    password: req.body.password,
-    displayName: req.body.displayName
-  };
-  users.push(user);
-  req.session.displayName = req.body.displayName;
-  req.session.save(function(){
-    res.redirect('/welcome');
-  })
+  hasher({password:req.body.password}, function(err, pass, salt, hash){
+    var user ={
+      username: req.body.username,
+      password: hash,
+      salt: salt,
+      displayName: req.body.displayName
+    };
+    users.push(user);
+    req.session.displayName = req.body.displayName;
+    return req.session.save(function(){
+      res.redirect('/welcome');
+    })
+  });
 });
 app.get('/auth/login', function(req, res){
   var output=`<h1>Login</h1><form action="/auth/login" method="post"><p><input type="text" name="username" placeholder="username"></p><p><input type="password" name="password" placeholder="password"></p><p><input type="submit"></p></form>`;
@@ -77,10 +84,16 @@ app.post('/auth/login', function(req, res){
   var pwd = req.body.password;
   for(var i=0; i<users.length; i++){
     var user=users[i];
-    if(uname === user.username && pwd === user.password){
-      req.session.displayName = user.displayName;
-      return req.session.save(function(){
-        res.redirect('/welcome');
+    if(uname === user.username){
+      return hasher({password: pwd, salt:user.salt}, function(err, pass, salt, hash){
+        if(hash === user.password){
+          req.session.displayName = user.displayName;
+          return req.session.save(function(){
+            res.redirect('/welcome');
+          })
+        }else{
+          res.send('Who are you? <a href="/auth/login">login</a>')
+        }
       })
     }
   }
