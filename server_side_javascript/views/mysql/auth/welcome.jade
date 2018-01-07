@@ -1,0 +1,16 @@
+html
+  body
+    - if (req.user && req.user.displayName){
+      h1 
+        | Hello, #{req.user.displayName}
+        h1
+          a(href='/auth/logout') Logout  
+    -} else{
+      h1
+        |Welcome new
+      ul
+        li
+          a(href='/auth/login') Login
+        li
+          a(href='/auth/register') Register
+    -}
